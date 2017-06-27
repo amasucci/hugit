@@ -2,11 +2,6 @@
 
 set -eux
 
-tar -xf /tmp/hugo.tar.gz -C /tmp
-mkdir -p /usr/local/sbin
-mv /tmp/hugo /usr/local/sbin/hugo
-rm -rf /tmp/hugo.tar.gz
-
 HUGO=/usr/local/sbin/hugo
 
 ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
