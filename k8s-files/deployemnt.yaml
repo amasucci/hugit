@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  namespace: blog-amasucci
+  name: blog-amasucci.com
+  labels:
+    app: blog-amasucci.com
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: blog-amasucci.com
+  template:
+    metadata:
+      labels:
+        app: blog-amasucci.com
+    spec:
+      volumes:
+      - name: git-volume
+        gitRepo:
+          repository: "https://github.com/amasucci/blog.git"
+          revision: "5b759c7366dc91a9c0bffa97017b8df6f88e232d"
+      containers:
+      - name: hugit
+        image: amasucci/hugit:b2
+        workingDir: /site/blog
+        env:
+        - name: HUGO_THEME
+          value: hugo-theme-bleak
+        - name: HUGO_BASEURL
+          value: http://amasucci.com
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /site
+          name: git-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: blog-amasucci
+  name: blog-amasucci-service
+spec:
+  selector:
+    app: blog-amasucci.com
+  ports:
+    - name: http
+      protocol: 'TCP'
+      port: 80
+      targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: blog-amasucci
+  name: blog-amasucci.com-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: amasucci.com
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: blog-amasucci-service
+          servicePort: http
