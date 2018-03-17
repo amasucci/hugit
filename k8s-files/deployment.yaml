@@ -22,7 +22,7 @@ spec:
       - name: git-volume
         gitRepo:
           repository: "https://github.com/amasucci/blog.git"
-          revision: "5b759c7366dc91a9c0bffa97017b8df6f88e232d"
+          revision: "2c077f82a271d8957043816bf5220ceaf78476f0"
       containers:
       - name: hugit
         image: amasucci/hugit:b2
@@ -31,7 +31,7 @@ spec:
         - name: HUGO_THEME
           value: hugo-theme-bleak
         - name: HUGO_BASEURL
-          value: http://amasucci.com
+          value: https://amasucci.com
         ports:
         - containerPort: 80
         volumeMounts:
@@ -59,7 +59,12 @@ metadata:
   name: blog-amasucci.com-ingress
   annotations:
     ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/tls-acme: "true"
 spec:
+  tls:
+  - hosts:
+    - amasucci.com
+    secretName: amasucci-com
   rules:
   - host: amasucci.com
     http:
